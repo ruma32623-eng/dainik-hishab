@@ -1,0 +1,1122 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>বাকি হিসাব - ডিজিটাল খাতা | Baki Hishab</title>
+    <style>
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Noto Sans Bengali", sans-serif;
+            background-color: #f1f5f9;
+            color: #1e293b;
+            padding-bottom: 90px;
+            line-height: 1.5;
+        }
+        /* Header */
+        header {
+            background-color: #047857;
+            color: #ffffff;
+            position: sticky;
+            top: 0;
+            z-index: 30;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.12);
+        }
+        .header-inner {
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 14px 16px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+        }
+        .brand { display: flex; align-items: center; gap: 10px; min-width: 0; }
+        .brand-icon {
+            background: rgba(255,255,255,0.2);
+            width: 38px;
+            height: 38px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 18px;
+            flex-shrink: 0;
+        }
+        .brand h1 { font-size: 18px; font-weight: 700; line-height: 1.2; white-space: nowrap; }
+        .brand p { font-size: 11px; color: #d1fae5; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .header-actions { display: flex; align-items: center; gap: 6px; flex-shrink: 0; }
+        .btn-lang {
+            background: rgba(255,255,255,0.18);
+            color: #ffffff;
+            border: 1px solid rgba(255,255,255,0.35);
+            padding: 7px 10px;
+            border-radius: 10px;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+        }
+        .btn-lang:active { transform: scale(0.96); }
+        .btn-new {
+            background: #ffffff;
+            color: #065f46;
+            border: none;
+            padding: 8px 12px;
+            border-radius: 12px;
+            font-weight: 700;
+            font-size: 12px;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            white-space: nowrap;
+        }
+        .btn-new:active { transform: scale(0.96); }
+
+        /* Main Container */
+        main {
+            max-width: 520px;
+            margin: 0 auto;
+            padding: 16px;
+            display: flex;
+            flex-direction: column;
+            gap: 14px;
+        }
+
+        /* Summary Grid */
+        .summary-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 12px;
+        }
+        .card {
+            background: #ffffff;
+            padding: 14px;
+            border-radius: 16px;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            border: 1px solid #e2e8f0;
+        }
+        .card-receivable { border-color: #d1fae5; }
+        .card-payable { border-color: #ffe4e6; }
+        .badge {
+            display: inline-block;
+            font-size: 11px;
+            font-weight: 700;
+            padding: 3px 8px;
+            border-radius: 8px;
+        }
+        .badge-green { background: #ecfdf5; color: #047857; }
+        .badge-red { background: #fff1f2; color: #be123c; }
+        .badge-gray { background: #f1f5f9; color: #475569; }
+        .amount-big { font-size: 22px; font-weight: 800; margin-top: 6px; }
+        .text-green { color: #059669; }
+        .text-red { color: #e11d48; }
+        .text-muted { color: #94a3b8; font-size: 11px; margin-top: 2px; }
+
+        /* Search & Filters */
+        .search-box {
+            width: 100%;
+            padding: 10px 14px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 14px;
+            outline: none;
+            margin-bottom: 10px;
+        }
+        .search-box:focus { border-color: #059669; background: #ffffff; }
+        .filter-row {
+            display: flex;
+            gap: 8px;
+            overflow-x: auto;
+        }
+        .filter-btn {
+            border: none;
+            padding: 7px 12px;
+            border-radius: 10px;
+            font-size: 12px;
+            font-weight: 600;
+            cursor: pointer;
+            white-space: nowrap;
+            background: #f1f5f9;
+            color: #475569;
+        }
+        .filter-btn.active {
+            background: #1e293b;
+            color: #ffffff;
+        }
+
+        /* Customer List */
+        .customer-list { display: flex; flex-direction: column; gap: 10px; }
+        .customer-item {
+            background: #ffffff;
+            padding: 14px;
+            border-radius: 16px;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 12px;
+            cursor: pointer;
+        }
+        .customer-item:active { transform: scale(0.99); }
+        .cust-left { display: flex; align-items: center; gap: 12px; min-width: 0; }
+        .avatar {
+            width: 44px;
+            height: 44px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 18px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-shrink: 0;
+        }
+        .avatar-green { background: #d1fae5; color: #047857; }
+        .avatar-red { background: #ffe4e6; color: #be123c; }
+        .avatar-gray { background: #f1f5f9; color: #475569; }
+        .cust-name { font-size: 16px; font-weight: 700; color: #1e293b; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+        .cust-meta { font-size: 12px; color: #64748b; margin-top: 2px; }
+        .cust-right { text-align: right; flex-shrink: 0; }
+        .cust-amount { font-size: 16px; font-weight: 800; }
+
+        /* Floating Button */
+        .fab {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            width: 54px;
+            height: 54px;
+            border-radius: 16px;
+            background: #059669;
+            color: #ffffff;
+            border: none;
+            font-size: 24px;
+            font-weight: bold;
+            box-shadow: 0 4px 12px rgba(5, 150, 105, 0.35);
+            cursor: pointer;
+            z-index: 20;
+        }
+
+        /* Modals */
+        .modal-backdrop {
+            position: fixed;
+            inset: 0;
+            background: rgba(15, 23, 42, 0.6);
+            z-index: 40;
+            display: flex;
+            align-items: flex-end;
+            justify-content: center;
+        }
+        .modal-backdrop.center { align-items: center; padding: 16px; }
+        .hidden { display: none !important; }
+        .modal-box {
+            background: #ffffff;
+            width: 100%;
+            max-width: 480px;
+            border-radius: 24px 24px 0 0;
+            padding: 20px;
+            max-height: 90vh;
+            overflow-y: auto;
+            box-shadow: 0 -4px 20px rgba(0,0,0,0.15);
+        }
+        .modal-backdrop.center .modal-box { border-radius: 20px; max-width: 340px; text-align: center; }
+        .modal-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding-bottom: 12px;
+            border-bottom: 1px solid #f1f5f9;
+            margin-bottom: 14px;
+        }
+        .modal-title { font-size: 17px; font-weight: 700; }
+        .btn-close {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: none;
+            background: #f1f5f9;
+            color: #475569;
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        /* Forms */
+        .form-group { margin-bottom: 12px; }
+        .form-label { display: block; font-size: 12px; font-weight: 700; color: #475569; margin-bottom: 5px; }
+        .form-input {
+            width: 100%;
+            padding: 10px 12px;
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 12px;
+            font-size: 14px;
+            outline: none;
+        }
+        .form-input:focus { border-color: #059669; background: #ffffff; }
+        .radio-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+        .radio-card { cursor: pointer; display: block; }
+        .radio-card input { display: none; }
+        .radio-box {
+            padding: 10px;
+            border: 2px solid #e2e8f0;
+            border-radius: 12px;
+            text-align: center;
+            transition: 0.15s;
+        }
+        .radio-card input:checked + .radio-box.green { border-color: #059669; background: #ecfdf5; color: #047857; }
+        .radio-card input:checked + .radio-box.red { border-color: #e11d48; background: #fff1f2; color: #be123c; }
+        .btn-submit {
+            width: 100%;
+            padding: 13px;
+            background: #059669;
+            color: #ffffff;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 700;
+            cursor: pointer;
+            margin-top: 6px;
+        }
+        .btn-dark { background: #1e293b; padding: 10px; font-size: 13px; }
+        .btn-danger { background: #e11d48; color: #fff; border: none; padding: 10px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+        .btn-secondary { background: #f1f5f9; color: #334155; border: none; padding: 10px; border-radius: 10px; font-weight: 700; cursor: pointer; }
+
+        /* Detail Modal Extras */
+        .detail-banner {
+            padding: 12px 14px;
+            border-radius: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 14px;
+        }
+        .tx-item {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            padding: 10px 12px;
+            border-radius: 12px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 8px;
+        }
+        .toast {
+            position: fixed;
+            bottom: 85px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: #1e293b;
+            color: #ffffff;
+            font-size: 12px;
+            font-weight: 600;
+            padding: 10px 18px;
+            border-radius: 99px;
+            z-index: 50;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+            transition: opacity 0.25s;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Top Header -->
+    <header>
+        <div class="header-inner">
+            <div class="brand">
+                <div class="brand-icon">📒</div>
+                <div>
+                    <h1 id="app-title">বাকি হিসাব</h1>
+                    <p id="app-subtitle">সহজ ডিজিটাল টালি খাতা</p>
+                </div>
+            </div>
+            <div class="header-actions">
+                <button onclick="toggleLanguage()" id="lang-toggle-btn" class="btn-lang" title="Switch Language">EN</button>
+                <button onclick="openAddPersonModal()" id="btn-new-account" class="btn-new">+ নতুন হিসাব</button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Container -->
+    <main>
+        <!-- Summary Cards -->
+        <section class="summary-grid">
+            <div class="card card-receivable">
+                <span id="badge-receivable" class="badge badge-green">মোট পাবো (পাওনা)</span>
+                <p id="total-receivable" class="amount-big text-green">৳ ০</p>
+                <p id="sub-receivable" class="text-muted">কাস্টমারদের কাছে পাওনা</p>
+            </div>
+            <div class="card card-payable">
+                <span id="badge-payable" class="badge badge-red">মোট দিবো (দেনা)</span>
+                <p id="total-payable" class="amount-big text-red">৳ ০</p>
+                <p id="sub-payable" class="text-muted">আপনার পরিশোধযোগ্য</p>
+            </div>
+        </section>
+
+        <!-- Search & Filter Bar -->
+        <section class="card">
+            <input type="text" id="search-input" oninput="renderCustomerList()" placeholder="নাম বা মোবাইল নম্বর দিয়ে খুঁজুন..." class="search-box">
+            <div class="filter-row">
+                <button onclick="setFilter('all')" id="filter-all" class="filter-btn active"><span id="lbl-filter-all">সব হিসাব</span> (<span id="count-all">0</span>)</button>
+                <button onclick="setFilter('receivable')" id="filter-receivable" class="filter-btn"><span id="lbl-filter-rec">পাবো</span> (<span id="count-receivable">0</span>)</button>
+                <button onclick="setFilter('payable')" id="filter-payable" class="filter-btn"><span id="lbl-filter-pay">দিবো</span> (<span id="count-payable">0</span>)</button>
+                <button onclick="setFilter('settled')" id="filter-settled" class="filter-btn"><span id="lbl-filter-set">পরিশোধিত</span> (<span id="count-settled">0</span>)</button>
+            </div>
+        </section>
+
+        <!-- Customer List -->
+        <section id="customer-list" class="customer-list"></section>
+    </main>
+
+    <!-- Floating Action Button -->
+    <button onclick="openAddPersonModal()" class="fab" id="fab-btn" aria-label="নতুন হিসাব যোগ করুন">+</button>
+
+    <!-- MODAL 1: Add New Person -->
+    <div id="add-person-modal" class="modal-backdrop hidden">
+        <div class="modal-box">
+            <div class="modal-header">
+                <h2 id="add-person-title" class="modal-title">নতুন কাস্টমার / হিসাব যোগ করুন</h2>
+                <button onclick="closeModal('add-person-modal')" class="btn-close">✕</button>
+            </div>
+
+            <form id="add-person-form" onsubmit="handleAddPerson(event)">
+                <div class="form-group">
+                    <label id="lbl-person-name" class="form-label">ব্যক্তি বা দোকানের নাম *</label>
+                    <input type="text" id="person-name" required placeholder="যেমন: করিম মিয়া / ভাই ভাই স্টোর" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label id="lbl-person-phone" class="form-label">মোবাইল নম্বর (ঐচ্ছিক)</label>
+                    <input type="tel" id="person-phone" placeholder="যেমন: 017XXXXXXXX" class="form-input">
+                </div>
+
+                <div class="form-group">
+                    <label id="lbl-initial-type" class="form-label">হিসাবের ধরন *</label>
+                    <div class="radio-grid">
+                        <label class="radio-card">
+                            <input type="radio" name="initial-type" value="receivable" checked>
+                            <div class="radio-box green">
+                                <div id="init-rec-title" style="font-weight:700; font-size:14px;">পাবো (+)</div>
+                                <div id="init-rec-sub" style="font-size:11px; color:#64748b;">বাকি দিলাম / পাওনা</div>
+                            </div>
+                        </label>
+                        <label class="radio-card">
+                            <input type="radio" name="initial-type" value="payable">
+                            <div class="radio-box red">
+                                <div id="init-pay-title" style="font-weight:700; font-size:14px;">দিবো (-)</div>
+                                <div id="init-pay-sub" style="font-size:11px; color:#64748b;">ধার নিলাম / জমা</div>
+                            </div>
+                        </label>
+                    </div>
+                </div>
+
+                <div class="radio-grid form-group">
+                    <div>
+                        <label id="lbl-initial-amount" class="form-label">টাকার পরিমাণ (৳) *</label>
+                        <input type="number" id="initial-amount" required min="1" step="any" placeholder="0" class="form-input" style="font-weight:700;">
+                    </div>
+                    <div>
+                        <label id="lbl-initial-date" class="form-label">তারিখ</label>
+                        <input type="date" id="initial-date" required class="form-input">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label id="lbl-initial-note" class="form-label">বিবরণ / নোট (ঐচ্ছিক)</label>
+                    <input type="text" id="initial-note" placeholder="যেমন: চাল ও ডাল বাবদ বাকি" class="form-input">
+                </div>
+
+                <button type="submit" id="btn-save-person" class="btn-submit">হিসাব সংরক্ষণ করুন</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- MODAL 2: Customer Details -->
+    <div id="customer-detail-modal" class="modal-backdrop hidden">
+        <div class="modal-box">
+            <div class="modal-header">
+                <div style="display:flex; align-items:center; gap:10px;">
+                    <div id="detail-avatar" class="avatar avatar-green">ক</div>
+                    <div>
+                        <h2 id="detail-name" class="modal-title">নাম</h2>
+                        <p id="detail-phone" style="font-size:12px; color:#64748b;">নম্বর নেই</p>
+                    </div>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button onclick="shareCustomerSummary()" id="btn-share-summary" class="badge badge-green" style="border:none; padding:8px 10px; cursor:pointer;">কপি/শেয়ার</button>
+                    <button onclick="closeModal('customer-detail-modal')" class="btn-close">✕</button>
+                </div>
+            </div>
+
+            <div id="detail-balance-banner" class="detail-banner badge-green">
+                <div>
+                    <span id="detail-status-label" style="font-size:12px; font-weight:700;">মোট পাবো (পাওনা)</span>
+                    <p id="detail-net-amount" style="font-size:22px; font-weight:800;">৳ ০</p>
+                </div>
+                <button onclick="promptDeleteCustomer()" id="btn-delete-customer" class="badge badge-red" style="border:none; padding:7px 10px; cursor:pointer;">মুছুন</button>
+            </div>
+
+            <!-- Add Transaction Form -->
+            <form id="add-tx-form" onsubmit="handleAddTransaction(event)" style="background:#f8fafc; padding:12px; border-radius:14px; border:1px solid #e2e8f0; margin-bottom:14px;">
+                <div class="radio-grid form-group">
+                    <label class="radio-card">
+                        <input type="radio" name="tx-type" value="receivable" checked>
+                        <div id="tx-rec-label" class="radio-box red" style="padding:8px; font-size:12px; font-weight:700;">+ বাকি দিলাম (পাবো)</div>
+                    </label>
+                    <label class="radio-card">
+                        <input type="radio" name="tx-type" value="payable">
+                        <div id="tx-pay-label" class="radio-box green" style="padding:8px; font-size:12px; font-weight:700;">- জমা পেলাম / নিলাম</div>
+                    </label>
+                </div>
+                <div style="display:flex; gap:8px; margin-bottom:8px;">
+                    <input type="number" id="tx-amount" required min="1" step="any" placeholder="টাকা (৳)" class="form-input" style="width:38%; font-weight:700;">
+                    <input type="text" id="tx-note" placeholder="বিবরণ (যেমন: নগদ জমা)" class="form-input" style="width:62%;">
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <input type="date" id="tx-date" required class="form-input" style="width:50%;">
+                    <button type="submit" id="btn-add-tx" class="btn-submit btn-dark" style="width:50%; margin-top:0;">লেনদেন যোগ করুন</button>
+                </div>
+            </form>
+
+            <div id="tx-history-list"></div>
+        </div>
+    </div>
+
+    <!-- Confirm Modal -->
+    <div id="confirm-modal" class="modal-backdrop center hidden">
+        <div class="modal-box">
+            <h3 id="confirm-title" style="font-size:16px; font-weight:700; margin-bottom:6px;">আপনি কি নিশ্চিত?</h3>
+            <p id="confirm-message" style="font-size:12px; color:#64748b; margin-bottom:16px;">এই তথ্যটি স্থায়ীভাবে মুছে যাবে।</p>
+            <div class="radio-grid">
+                <button onclick="closeModal('confirm-modal')" id="btn-cancel-confirm" class="btn-secondary">বাতিল</button>
+                <button id="confirm-yes-btn" class="btn-danger">হ্যাঁ, মুছুন</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Toast -->
+    <div id="toast" class="toast hidden">সংরক্ষণ করা হয়েছে</div>
+
+    <script>
+        const STORAGE_KEY = 'baki_hishab_data_v1';
+        const LANG_KEY = 'baki_hishab_lang_v1';
+        const MONETAG_DIRECT_LINK = 'https://uplcm.com/4/12307058';
+        const AD_EVERY_N_CLICKS = 2;
+        let userClickCount = 0;
+
+        function triggerEveryTwoClicksAd(event) {
+            // ইনপুট বক্স বা ফর্ম সাবমিটে ক্লিক করলে ইউজারের টাইপিংয়ে বাধা দেবে না
+            const target = event.target;
+            if (!target || target.closest('input, textarea, select, form')) return;
+
+            userClickCount += 1;
+            if (userClickCount % AD_EVERY_N_CLICKS === 0) {
+                const opened = window.open(MONETAG_DIRECT_LINK, '_blank', 'noopener,noreferrer');
+                if (!opened) {
+                    window.location.href = MONETAG_DIRECT_LINK;
+                }
+            }
+        }
+
+        const I18N = {
+            bn: {
+                docTitle: 'বাকি হিসাব - ডিজিটাল খাতা',
+                appTitle: 'বাকি হিসাব',
+                appSubtitle: 'সহজ ডিজিটাল টালি খাতা',
+                langBtn: 'EN',
+                newAccount: '+ নতুন হিসাব',
+                badgeReceivable: 'মোট পাবো (পাওনা)',
+                subReceivable: 'কাস্টমারদের কাছে পাওনা',
+                badgePayable: 'মোট দিবো (দেনা)',
+                subPayable: 'আপনার পরিশোধযোগ্য',
+                searchPlaceholder: 'নাম বা মোবাইল নম্বর দিয়ে খুঁজুন...',
+                filterAll: 'সব হিসাব',
+                filterRec: 'পাবো',
+                filterPay: 'দিবো',
+                filterSet: 'পরিশোধিত',
+                emptyTitle: 'কোনো হিসাব পাওয়া যায়নি',
+                emptySub: 'উপরের "+ নতুন হিসাব" বাটনে ক্লিক করে যোগ করুন',
+                settledBadge: 'পরিশোধ',
+                recBadge: 'পাবো',
+                payBadge: 'দিবো',
+                addPersonTitle: 'নতুন কাস্টমার / হিসাব যোগ করুন',
+                lblPersonName: 'ব্যক্তি বা দোকানের নাম *',
+                phPersonName: 'যেমন: করিম মিয়া / ভাই ভাই স্টোর',
+                lblPersonPhone: 'মোবাইল নম্বর (ঐচ্ছিক)',
+                phPersonPhone: 'যেমন: 017XXXXXXXX',
+                lblInitialType: 'হিসাবের ধরন *',
+                initRecTitle: 'পাবো (+)',
+                initRecSub: 'বাকি দিলাম / পাওনা',
+                initPayTitle: 'দিবো (-)',
+                initPaySub: 'ধার নিলাম / জমা',
+                lblInitialAmount: 'টাকার পরিমাণ (৳) *',
+                lblInitialDate: 'তারিখ',
+                lblInitialNote: 'বিবরণ / নোট (ঐচ্ছিক)',
+                phInitialNote: 'যেমন: চাল ও ডাল বাবদ বাকি',
+                btnSavePerson: 'হিসাব সংরক্ষণ করুন',
+                defaultInitRecNote: 'বাকি হিসাব',
+                defaultInitPayNote: 'ধার/জমা হিসাব',
+                noPhone: 'মোবাইল নম্বর দেওয়া নেই',
+                shareBtn: 'কপি/শেয়ার',
+                deleteBtn: 'মুছুন',
+                detailRecLabel: 'মোট পাবো (আপনার পাওনা)',
+                detailPayLabel: 'মোট দিবো (আপনার দেনা)',
+                detailSetLabel: 'হিসাব সমান (পরিশোধিত)',
+                txRecLabel: '+ বাকি দিলাম (পাবো)',
+                txPayLabel: '- জমা পেলাম / নিলাম',
+                phTxAmount: 'টাকা (৳)',
+                phTxNote: 'বিবরণ (যেমন: নগদ জমা)',
+                btnAddTx: 'লেনদেন যোগ করুন',
+                defaultTxRecNote: 'বাকি যোগ',
+                defaultTxPayNote: 'জমা / পরিশোধ',
+                txHistoryHeader: (count) => `লেনদেনের বিবরণ (${toBengaliNumber(count)}টি)`,
+                noTx: 'কোনো লেনদেনের তথ্য নেই',
+                defaultTxTitle: 'সাধারণ লেনদেন',
+                txGivenBadge: 'বাকি দিলাম (+)',
+                txGotBadge: 'জমা / নিলাম (-)',
+                cancelBtn: 'বাতিল',
+                confirmDeleteBtn: 'হ্যাঁ, মুছুন',
+                delCustTitle: (name) => `"${name}"-এর হিসাব মুছবেন?`,
+                delCustMsg: 'এই ব্যক্তির সকল লেনদেনের ইতিহাস স্থায়ীভাবে মুছে যাবে।',
+                delTxTitle: 'এই লেনদেনটি মুছবেন?',
+                delTxMsg: 'মুছে ফেললে মোট হিসাব স্বয়ংক্রিয়ভাবে আপডেট হবে।',
+                toastStorageFull: 'মেমোরি পূর্ণ! ডেটা সেভ করা যায়নি।',
+                toastPersonAdded: 'নতুন হিসাব যোগ করা হয়েছে',
+                toastTxAdded: 'লেনদেন যুক্ত হয়েছে',
+                toastCustDeleted: 'হিসাব মুছে ফেলা হয়েছে',
+                toastTxDeleted: 'লেনদেন মুছে ফেলা হয়েছে',
+                toastCopied: 'হিসাবের সারাংশ কপি হয়েছে!',
+                toastCopyFailed: 'কপি করা সম্ভব হয়নি',
+                sampleName: 'আব্দুল করিম (নমুনা)',
+                sampleNote: 'বাকি বাবদ (নমুনা হিসাব)',
+                months: ['জানু', 'ফেব্রু', 'মার্চ', 'এপ্রিল', 'মে', 'জুন', 'জুলাই', 'আগস্ট', 'সেপ্টে', 'অক্টো', 'নভে', 'ডিসে'],
+                shareHeader: '📒 বাকি হিসাব বিবরণী',
+                shareName: (name) => `নাম: ${name}`,
+                shareRec: (amt) => `মোট পাওনা (বাকি): ৳ ${amt}`,
+                sharePay: (amt) => `মোট দেনা (জমা): ৳ ${amt}`,
+                shareSet: (amt) => `হিসাব পরিশোধিত: ৳ ${amt}`,
+                shareRecentTitle: 'সাম্প্রতিক লেনদেন:',
+                shareGivenTag: '(+ বাকি)',
+                shareGotTag: '(- জমা)',
+                shareFooter: '- বাকি হিসাব ডিজিটাল খাতা'
+            },
+            en: {
+                docTitle: 'Baki Hishab - Digital Ledger',
+                appTitle: 'Baki Hishab',
+                appSubtitle: 'Simple Digital Khata Ledger',
+                langBtn: 'বাংলা',
+                newAccount: '+ New Account',
+                badgeReceivable: 'Total Receivable',
+                subReceivable: 'Amount customers owe you',
+                badgePayable: 'Total Payable',
+                subPayable: 'Amount you need to pay',
+                searchPlaceholder: 'Search by name or phone number...',
+                filterAll: 'All',
+                filterRec: 'Receivable',
+                filterPay: 'Payable',
+                filterSet: 'Settled',
+                emptyTitle: 'No accounts found',
+                emptySub: 'Click "+ New Account" above to add one',
+                settledBadge: 'Settled',
+                recBadge: 'Receivable',
+                payBadge: 'Payable',
+                addPersonTitle: 'Add New Customer / Account',
+                lblPersonName: 'Person or Shop Name *',
+                phPersonName: 'e.g., Karim Mia / Bhai Bhai Store',
+                lblPersonPhone: 'Phone Number (Optional)',
+                phPersonPhone: 'e.g., 017XXXXXXXX',
+                lblInitialType: 'Account Type *',
+                initRecTitle: 'Receivable (+)',
+                initRecSub: 'Credit given / Due to you',
+                initPayTitle: 'Payable (-)',
+                initPaySub: 'Borrowed / Advance taken',
+                lblInitialAmount: 'Amount (৳) *',
+                lblInitialDate: 'Date',
+                lblInitialNote: 'Description / Note (Optional)',
+                phInitialNote: 'e.g., Rice & lentils on credit',
+                btnSavePerson: 'Save Account',
+                defaultInitRecNote: 'Credit account',
+                defaultInitPayNote: 'Borrowed / Advance',
+                noPhone: 'No phone number added',
+                shareBtn: 'Copy/Share',
+                deleteBtn: 'Delete',
+                detailRecLabel: 'Total Receivable (You Get)',
+                detailPayLabel: 'Total Payable (You Give)',
+                detailSetLabel: 'All Settled',
+                txRecLabel: '+ Credit Given (+)',
+                txPayLabel: '- Payment / Taken (-)',
+                phTxAmount: 'Amount (৳)',
+                phTxNote: 'Note (e.g., Cash payment)',
+                btnAddTx: 'Add Transaction',
+                defaultTxRecNote: 'Credit added',
+                defaultTxPayNote: 'Payment / Settled',
+                txHistoryHeader: (count) => `Transactions (${count})`,
+                noTx: 'No transactions yet',
+                defaultTxTitle: 'General transaction',
+                txGivenBadge: 'Credit Given (+)',
+                txGotBadge: 'Payment / Taken (-)',
+                cancelBtn: 'Cancel',
+                confirmDeleteBtn: 'Yes, Delete',
+                delCustTitle: (name) => `Delete "${name}"?`,
+                delCustMsg: 'All transaction history for this person will be permanently deleted.',
+                delTxTitle: 'Delete this transaction?',
+                delTxMsg: 'The total balance will update automatically.',
+                toastStorageFull: 'Storage full! Could not save data.',
+                toastPersonAdded: 'New account added',
+                toastTxAdded: 'Transaction added',
+                toastCustDeleted: 'Account deleted',
+                toastTxDeleted: 'Transaction deleted',
+                toastCopied: 'Summary copied to clipboard!',
+                toastCopyFailed: 'Could not copy summary',
+                sampleName: 'Abdul Karim (Sample)',
+                sampleNote: 'Credit balance (Sample entry)',
+                months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+                shareHeader: '📒 Baki Hishab Statement',
+                shareName: (name) => `Name: ${name}`,
+                shareRec: (amt) => `Total Receivable: ৳ ${amt}`,
+                sharePay: (amt) => `Total Payable: ৳ ${amt}`,
+                shareSet: (amt) => `Settled: ৳ ${amt}`,
+                shareRecentTitle: 'Recent Transactions:',
+                shareGivenTag: '(+ Credit)',
+                shareGotTag: '(- Paid)',
+                shareFooter: '- Baki Hishab Digital Ledger'
+            }
+        };
+
+        let currentLang = 'bn';
+        let customers = [];
+        let currentFilter = 'all';
+        let selectedCustomerId = null;
+
+        function t(key, ...args) {
+            const val = I18N[currentLang][key] ?? I18N.bn[key];
+            return typeof val === 'function' ? val(...args) : val;
+        }
+
+        function toBengaliNumber(num) {
+            const bengaliDigits = ['০', '১', '২', '৩', '৪', '৫', '৬', '৭', '৮', '৯'];
+            const formatted = Number(num).toLocaleString('en-IN');
+            if (currentLang === 'en') return formatted;
+            return formatted.replace(/\d/g, d => bengaliDigits[d]);
+        }
+
+        function formatDateBn(dateStr) {
+            if (!dateStr) return '';
+            const months = I18N[currentLang].months;
+            const parts = dateStr.split('-');
+            if (parts.length !== 3) return dateStr;
+            const dayNum = parseInt(parts[2], 10);
+            const month = months[parseInt(parts[1], 10) - 1] || '';
+            const yearNum = parseInt(parts[0], 10);
+            if (currentLang === 'en') {
+                return `${dayNum} ${month}, ${yearNum}`;
+            }
+            return `${toBengaliNumber(dayNum)}${month}, ${toBengaliNumber(yearNum)}`;
+        }
+
+        function getTodayStr() {
+            const now = new Date();
+            const offset = now.getTimezoneOffset();
+            const local = new Date(now.getTime() - (offset * 60 * 1000));
+            return local.toISOString().split('T')[0];
+        }
+
+        function loadLang() {
+            try {
+                const savedLang = localStorage.getItem(LANG_KEY);
+                if (savedLang === 'bn' || savedLang === 'en') {
+                    currentLang = savedLang;
+                }
+            } catch (e) {}
+        }
+
+        function applyLanguageUI() {
+            document.documentElement.lang = currentLang;
+            document.title = t('docTitle');
+            document.getElementById('app-title').textContent = t('appTitle');
+            document.getElementById('app-subtitle').textContent = t('appSubtitle');
+            document.getElementById('lang-toggle-btn').textContent = t('langBtn');
+            document.getElementById('btn-new-account').textContent = t('newAccount');
+            document.getElementById('fab-btn').setAttribute('aria-label', t('newAccount'));
+
+            document.getElementById('badge-receivable').textContent = t('badgeReceivable');
+            document.getElementById('sub-receivable').textContent = t('subReceivable');
+            document.getElementById('badge-payable').textContent = t('badgePayable');
+            document.getElementById('sub-payable').textContent = t('subPayable');
+
+            document.getElementById('search-input').placeholder = t('searchPlaceholder');
+            document.getElementById('lbl-filter-all').textContent = t('filterAll');
+            document.getElementById('lbl-filter-rec').textContent = t('filterRec');
+            document.getElementById('lbl-filter-pay').textContent = t('filterPay');
+            document.getElementById('lbl-filter-set').textContent = t('filterSet');
+
+            // Add Person Modal
+            document.getElementById('add-person-title').textContent = t('addPersonTitle');
+            document.getElementById('lbl-person-name').textContent = t('lblPersonName');
+            document.getElementById('person-name').placeholder = t('phPersonName');
+            document.getElementById('lbl-person-phone').textContent = t('lblPersonPhone');
+            document.getElementById('person-phone').placeholder = t('phPersonPhone');
+            document.getElementById('lbl-initial-type').textContent = t('lblInitialType');
+            document.getElementById('init-rec-title').textContent = t('initRecTitle');
+            document.getElementById('init-rec-sub').textContent = t('initRecSub');
+            document.getElementById('init-pay-title').textContent = t('initPayTitle');
+            document.getElementById('init-pay-sub').textContent = t('initPaySub');
+            document.getElementById('lbl-initial-amount').textContent = t('lblInitialAmount');
+            document.getElementById('lbl-initial-date').textContent = t('lblInitialDate');
+            document.getElementById('lbl-initial-note').textContent = t('lblInitialNote');
+            document.getElementById('initial-note').placeholder = t('phInitialNote');
+            document.getElementById('btn-save-person').textContent = t('btnSavePerson');
+
+            // Detail Modal
+            document.getElementById('btn-share-summary').textContent = t('shareBtn');
+            document.getElementById('btn-delete-customer').textContent = t('deleteBtn');
+            document.getElementById('tx-rec-label').textContent = t('txRecLabel');
+            document.getElementById('tx-pay-label').textContent = t('txPayLabel');
+            document.getElementById('tx-amount').placeholder = t('phTxAmount');
+            document.getElementById('tx-note').placeholder = t('phTxNote');
+            document.getElementById('btn-add-tx').textContent = t('btnAddTx');
+
+            // Confirm Modal
+            document.getElementById('btn-cancel-confirm').textContent = t('cancelBtn');
+            document.getElementById('confirm-yes-btn').textContent = t('confirmDeleteBtn');
+
+            renderCustomerList();
+            if (selectedCustomerId && !document.getElementById('customer-detail-modal').classList.contains('hidden')) {
+                const customer = customers.find(c => c.id === selectedCustomerId);
+                if (customer) renderCustomerDetailContent(customer);
+            }
+        }
+
+        function toggleLanguage() {
+            currentLang = currentLang === 'bn' ? 'en' : 'bn';
+            try { localStorage.setItem(LANG_KEY, currentLang); } catch (e) {}
+            applyLanguageUI();
+        }
+
+        function loadData() {
+            try {
+                const raw = localStorage.getItem(STORAGE_KEY);
+                if (raw) {
+                    customers = JSON.parse(raw);
+                } else {
+                    customers = [
+                        {
+                            id: 'sample-1',
+                            name: t('sampleName'),
+                            phone: '01700000000',
+                            transactions: [
+                                { id: 'tx-1', type: 'receivable', amount: 500, note: t('sampleNote'), date: getTodayStr() }
+                            ]
+                        }
+                    ];
+                    saveData();
+                }
+            } catch (e) {
+                customers = [];
+            }
+        }
+
+        function saveData() {
+            try {
+                localStorage.setItem(STORAGE_KEY, JSON.stringify(customers));
+            } catch (e) {
+                showToast(t('toastStorageFull'));
+            }
+        }
+
+        function getCustomerBalance(customer) {
+            return customer.transactions.reduce((acc, tx) => {
+                return tx.type === 'receivable' ? acc + Number(tx.amount) : acc - Number(tx.amount);
+            }, 0);
+        }
+
+        function updateSummaryAndCounts() {
+            let totalReceivable = 0, totalPayable = 0;
+            let countReceivable = 0, countPayable = 0, countSettled = 0;
+
+            customers.forEach(c => {
+                const bal = getCustomerBalance(c);
+                if (bal > 0) {
+                    totalReceivable += bal;
+                    countReceivable++;
+                } else if (bal < 0) {
+                    totalPayable += Math.abs(bal);
+                    countPayable++;
+                } else {
+                    countSettled++;
+                }
+            });
+
+            document.getElementById('total-receivable').textContent = `৳ ${toBengaliNumber(totalReceivable)}`;
+            document.getElementById('total-payable').textContent = `৳ ${toBengaliNumber(totalPayable)}`;
+            document.getElementById('count-all').textContent = toBengaliNumber(customers.length);
+            document.getElementById('count-receivable').textContent = toBengaliNumber(countReceivable);
+            document.getElementById('count-payable').textContent = toBengaliNumber(countPayable);
+            document.getElementById('count-settled').textContent = toBengaliNumber(countSettled);
+        }
+
+        function setFilter(filter) {
+            currentFilter = filter;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            const activeBtn = document.getElementById(`filter-${filter}`);
+            if (activeBtn) activeBtn.classList.add('active');
+            renderCustomerList();
+        }
+
+        function renderCustomerList() {
+            updateSummaryAndCounts();
+            const listEl = document.getElementById('customer-list');
+            const query = document.getElementById('search-input').value.trim().toLowerCase();
+
+            const filtered = customers.filter(c => {
+                const matchesSearch = c.name.toLowerCase().includes(query) || (c.phone && c.phone.includes(query));
+                if (!matchesSearch) return false;
+                const bal = getCustomerBalance(c);
+                if (currentFilter === 'receivable') return bal > 0;
+                if (currentFilter === 'payable') return bal < 0;
+                if (currentFilter === 'settled') return bal === 0;
+                return true;
+            });
+
+            if (filtered.length === 0) {
+                listEl.innerHTML = `<div class="card" style="text-align:center; padding:30px 16px;"><p style="font-weight:700; color:#475569;">${escapeHtml(t('emptyTitle'))}</p><p class="text-muted">${escapeHtml(t('emptySub'))}</p></div>`;
+                return;
+            }
+
+            listEl.innerHTML = filtered.map(c => {
+                const bal = getCustomerBalance(c);
+                const firstChar = c.name.trim().charAt(0) || '?';
+                const lastTx = c.transactions[c.transactions.length - 1];
+                const lastDate = lastTx ? formatDateBn(lastTx.date) : '';
+
+                let amountHtml = `<p class="cust-amount" style="color:#94a3b8;">৳ ${toBengaliNumber(0)}</p>`;
+                let badgeHtml = `<span class="badge badge-gray">${escapeHtml(t('settledBadge'))}</span>`;
+                let avatarClass = 'avatar-gray';
+
+                if (bal > 0) {
+                    amountHtml = `<p class="cust-amount text-green">৳ ${toBengaliNumber(bal)}</p>`;
+                    badgeHtml = `<span class="badge badge-green">${escapeHtml(t('recBadge'))}</span>`;
+                    avatarClass = 'avatar-green';
+                } else if (bal < 0) {
+                    amountHtml = `<p class="cust-amount text-red">৳ ${toBengaliNumber(Math.abs(bal))}</p>`;
+                    badgeHtml = `<span class="badge badge-red">${escapeHtml(t('payBadge'))}</span>`;
+                    avatarClass = 'avatar-red';
+                }
+
+                return `
+                    <div onclick="openCustomerDetail('${c.id}')" class="customer-item">
+                        <div class="cust-left">
+                            <div class="avatar ${avatarClass}">${escapeHtml(firstChar)}</div>
+                            <div style="min-width:0;">
+                                <h3 class="cust-name">${escapeHtml(c.name)}</h3>
+                                <p class="cust-meta">${c.phone ? escapeHtml(c.phone) + ' • ' : ''}${lastDate}</p>
+                            </div>
+                        </div>
+                        <div class="cust-right">
+                            ${amountHtml}
+                            <div style="margin-top:3px;">${badgeHtml}</div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function openAddPersonModal() {
+            document.getElementById('add-person-form').reset();
+            document.getElementById('initial-date').value = getTodayStr();
+            document.getElementById('add-person-modal').classList.remove('hidden');
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.add('hidden');
+        }
+
+        function handleAddPerson(e) {
+            e.preventDefault();
+            const name = document.getElementById('person-name').value.trim();
+            const phone = document.getElementById('person-phone').value.trim();
+            const type = document.querySelector('input[name="initial-type"]:checked').value;
+            const amount = parseFloat(document.getElementById('initial-amount').value);
+            const date = document.getElementById('initial-date').value || getTodayStr();
+            const note = document.getElementById('initial-note').value.trim() || (type === 'receivable' ? t('defaultInitRecNote') : t('defaultInitPayNote'));
+
+            if (!name || isNaN(amount) || amount <= 0) return;
+
+            customers.unshift({
+                id: 'cust-' + Date.now(),
+                name,
+                phone,
+                transactions: [{ id: 'tx-' + Date.now(), type, amount, note, date }]
+            });
+
+            saveData();
+            closeModal('add-person-modal');
+            renderCustomerList();
+            showToast(t('toastPersonAdded'));
+        }
+
+        function openCustomerDetail(id) {
+            selectedCustomerId = id;
+            const customer = customers.find(c => c.id === id);
+            if (!customer) return;
+
+            document.getElementById('add-tx-form').reset();
+            document.getElementById('tx-date').value = getTodayStr();
+            renderCustomerDetailContent(customer);
+            document.getElementById('customer-detail-modal').classList.remove('hidden');
+        }
+
+        function renderCustomerDetailContent(customer) {
+            const bal = getCustomerBalance(customer);
+            document.getElementById('detail-name').textContent = customer.name;
+            document.getElementById('detail-avatar').textContent = customer.name.trim().charAt(0) || '?';
+            document.getElementById('detail-phone').textContent = customer.phone || t('noPhone');
+
+            const banner = document.getElementById('detail-balance-banner');
+            const statusLabel = document.getElementById('detail-status-label');
+            const netAmount = document.getElementById('detail-net-amount');
+
+            if (bal > 0) {
+                banner.className = 'detail-banner badge-green';
+                statusLabel.textContent = t('detailRecLabel');
+                netAmount.textContent = `৳ ${toBengaliNumber(bal)}`;
+            } else if (bal < 0) {
+                banner.className = 'detail-banner badge-red';
+                statusLabel.textContent = t('detailPayLabel');
+                netAmount.textContent = `৳ ${toBengaliNumber(Math.abs(bal))}`;
+            } else {
+                banner.className = 'detail-banner badge-gray';
+                statusLabel.textContent = t('detailSetLabel');
+                netAmount.textContent = `৳ ${toBengaliNumber(0)}`;
+            }
+
+            const historyEl = document.getElementById('tx-history-list');
+            const reversedTxs = [...customer.transactions].reverse();
+
+            if (reversedTxs.length === 0) {
+                historyEl.innerHTML = `<p style="text-align:center; font-size:12px; color:#94a3b8; padding:20px;">${escapeHtml(t('noTx'))}</p>`;
+                return;
+            }
+
+            historyEl.innerHTML = `
+                <p style="font-size:11px; font-weight:700; color:#64748b; margin-bottom:8px;">${escapeHtml(t('txHistoryHeader', reversedTxs.length))}</p>
+                ${reversedTxs.map(tx => {
+                    const isReceivable = tx.type === 'receivable';
+                    return `
+                        <div class="tx-item">
+                            <div style="min-width:0;">
+                                <span class="badge ${isReceivable ? 'badge-red' : 'badge-green'}">${escapeHtml(isReceivable ? t('txGivenBadge') : t('txGotBadge'))}</span>
+                                <span style="font-size:11px; color:#94a3b8; margin-left:6px;">${formatDateBn(tx.date)}</span>
+                                <p style="font-size:13px; font-weight:600; color:#334155; margin-top:4px;">${escapeHtml(tx.note || t('defaultTxTitle'))}</p>
+                            </div>
+                            <div style="display:flex; align-items:center; gap:10px; flex-shrink:0;">
+                                <span class="${isReceivable ? 'text-red' : 'text-green'}" style="font-weight:800; font-size:14px;">৳ ${toBengaliNumber(tx.amount)}</span>
+                                <button onclick="promptDeleteTransaction('${tx.id}')" style="border:none; background:none; color:#94a3b8; cursor:pointer; font-size:14px;">🗑️</button>
+                            </div>
+                        </div>
+                    `;
+                }).join('')}
+            `;
+        }
+
+        function handleAddTransaction(e) {
+            e.preventDefault();
+            const customer = customers.find(c => c.id === selectedCustomerId);
+            if (!customer) return;
+
+            const type = document.querySelector('input[name="tx-type"]:checked').value;
+            const amount = parseFloat(document.getElementById('tx-amount').value);
+            const note = document.getElementById('tx-note').value.trim() || (type === 'receivable' ? t('defaultTxRecNote') : t('defaultTxPayNote'));
+            const date = document.getElementById('tx-date').value || getTodayStr();
+
+            if (isNaN(amount) || amount <= 0) return;
+
+            customer.transactions.push({ id: 'tx-' + Date.now(), type, amount, note, date });
+            saveData();
+            document.getElementById('tx-amount').value = '';
+            document.getElementById('tx-note').value = '';
+            renderCustomerDetailContent(customer);
+            renderCustomerList();
+            showToast(t('toastTxAdded'));
+        }
+
+        function promptDeleteCustomer() {
+            const customer = customers.find(c => c.id === selectedCustomerId);
+            if (!customer) return;
+            document.getElementById('confirm-title').textContent = t('delCustTitle', customer.name);
+            document.getElementById('confirm-message').textContent = t('delCustMsg');
+            document.getElementById('confirm-yes-btn').onclick = () => {
+                customers = customers.filter(c => c.id !== selectedCustomerId);
+                saveData();
+                closeModal('confirm-modal');
+                closeModal('customer-detail-modal');
+                renderCustomerList();
+                showToast(t('toastCustDeleted'));
+            };
+            document.getElementById('confirm-modal').classList.remove('hidden');
+        }
+
+        function promptDeleteTransaction(txId) {
+            const customer = customers.find(c => c.id === selectedCustomerId);
+            if (!customer) return;
+            document.getElementById('confirm-title').textContent = t('delTxTitle');
+            document.getElementById('confirm-message').textContent = t('delTxMsg');
+            document.getElementById('confirm-yes-btn').onclick = () => {
+                customer.transactions = customer.transactions.filter(t => t.id !== txId);
+                saveData();
+                closeModal('confirm-modal');
+                renderCustomerDetailContent(customer);
+                renderCustomerList();
+                showToast(t('toastTxDeleted'));
+            };
+            document.getElementById('confirm-modal').classList.remove('hidden');
+        }
+
+        function shareCustomerSummary() {
+            const customer = customers.find(c => c.id === selectedCustomerId);
+            if (!customer) return;
+            const bal = getCustomerBalance(customer);
+            let statusText = bal > 0
+                ? t('shareRec', toBengaliNumber(bal))
+                : (bal < 0 ? t('sharePay', toBengaliNumber(Math.abs(bal))) : t('shareSet', toBengaliNumber(0)));
+
+            const recentTxs = [...customer.transactions].slice(-5).map(tx =>
+                `• ${formatDateBn(tx.date)}: ৳${toBengaliNumber(tx.amount)} ${tx.type === 'receivable' ? t('shareGivenTag') : t('shareGotTag')} - ${tx.note}`
+            ).join('\n');
+
+            const summaryText = `${t('shareHeader')}\n${t('shareName', customer.name)}\n${statusText}\n\n${t('shareRecentTitle')}\n${recentTxs}\n\n${t('shareFooter')}`;
+
+            const textarea = document.createElement('textarea');
+            textarea.value = summaryText;
+            textarea.style.position = 'fixed';
+            textarea.style.opacity = '0';
+            document.body.appendChild(textarea);
+            textarea.select();
+            try {
+                document.execCommand('copy');
+                showToast(t('toastCopied'));
+            } catch (err) {
+                showToast(t('toastCopyFailed'));
+            }
+            document.body.removeChild(textarea);
+        }
+
+        function showToast(msg) {
+            const toast = document.getElementById('toast');
+            toast.textContent = msg;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 2500);
+        }
+
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+        }
+
+        window.addEventListener('DOMContentLoaded', () => {
+            loadLang();
+            loadData();
+            applyLanguageUI();
+            document.addEventListener('click', triggerEveryTwoClicksAd);
+        });
+    </script>
+</body>
+</html>
